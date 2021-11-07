@@ -1,55 +1,62 @@
 package main
 
+/* -
+
+- Random int dönderen fonksiyonun max değeri databasedeki toplam quote sayısından almalı. (query.sql dosyasına getQuotes ekle)
+
+
+
+
+*/
+
 import (
-	"daily-quote/db/models"
+	"context"
+	db "daily-quote/db/sqlc"
 	"database/sql"
-	"fmt"
-	"log"
+	"math/rand"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	_ "github.com/lib/pq"
 )
 
 const (
-	host     = "localhost"
-	port     = 5432
-	user     = "root"
-	password = "123456"
-	dbname   = "quote-app"
+	dbDriver = "postgres"
+	dbSource = "postgresql://root:123456@localhost:5432/quote-app?sslmode=disable"
 )
+
+var testQueries *db.Queries
 
 func main() {
 	app := fiber.New()
 
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
-	DB, err := sql.Open("postgres", psqlInfo)
-	if err != nil {
-		log.Fatalf("Tidak Konek DB Errornya : %s", err)
-	}
-
 	app.Get("/", func(c *fiber.Ctx) error {
 
+		return c.JSON(GetQuote())
 	})
-
 	app.Listen(":8080")
 }
 
-func GetHandler(db *sql.DB) []models.Quote {
-	rows, err := db.Query("SELECT * FROM quotes")
+func GetQuote() db.Quote {
+	conn, err := sql.Open(dbDriver, dbSource)
 	if err != nil {
 		panic(err)
 	}
-	defer rows.Close()
 
-	quotes := []models.Quote{}
+	testQueries = db.New(conn)
 
-	for rows.Next() {
-		var q models.Quote
-		if err := rows.Scan(&q.ID, &q.Author, &q.Quote); err != nil {
-			panic(err)
-		}
-		quotes = append(quotes, q)
+	q, err2 := testQueries.GetQuote(context.Background(), int64(GetRandomInt()))
+	if err2 != nil {
+		panic(err)
 	}
 
-	return quotes
+	//data, _ := json.Marshal(q)
+	//quote := string(data)
+	return q
+}
+
+func GetRandomInt() int {
+	rand.Seed(time.Now().UnixNano())
+	num := 1 + rand.Intn(4-1)
+	return num
 }
