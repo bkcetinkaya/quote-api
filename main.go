@@ -3,7 +3,7 @@ package main
 /* -
 
 - Random int dönderen fonksiyonun max değeri databasedeki toplam quote sayısından almalı. (query.sql dosyasına getQuotes ekle)
-
+- db source gizli olmalı (probably env var kullanılacak)
 
 
 
@@ -12,7 +12,9 @@ package main
 import (
 	"context"
 	db "daily-quote/db/sqlc"
+	util "daily-quote/utils"
 	"database/sql"
+	"log"
 	"math/rand"
 	"time"
 
@@ -20,14 +22,10 @@ import (
 	_ "github.com/lib/pq"
 )
 
-const (
-	dbDriver = "postgres"
-	dbSource = "postgresql://root:123456@localhost:5432/quote-app?sslmode=disable"
-)
-
 var testQueries *db.Queries
 
 func main() {
+
 	app := fiber.New()
 
 	app.Get("/", func(c *fiber.Ctx) error {
@@ -38,20 +36,25 @@ func main() {
 }
 
 func GetQuote() db.Quote {
-	conn, err := sql.Open(dbDriver, dbSource)
+
+	config, err := util.LoadConfig(".")
+
 	if err != nil {
-		panic(err)
+		log.Fatal("cannot load config:", err)
+	}
+
+	conn, err2 := sql.Open(config.DBDriver, config.DBSource)
+	if err2 != nil {
+		panic(err2)
 	}
 
 	testQueries = db.New(conn)
 
-	q, err2 := testQueries.GetQuote(context.Background(), int64(GetRandomInt()))
-	if err2 != nil {
-		panic(err)
+	q, err3 := testQueries.GetQuote(context.Background(), int64(GetRandomInt()))
+	if err3 != nil {
+		panic(err3)
 	}
 
-	//data, _ := json.Marshal(q)
-	//quote := string(data)
 	return q
 }
 
