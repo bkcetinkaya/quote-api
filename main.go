@@ -59,7 +59,13 @@ func GetQuote() db.Quote {
 }
 
 func GetRandomInt() int {
+
+	rowCount, err := testQueries.GetQuoteRows(context.Background())
+	if err != nil {
+		panic(err)
+	}
+
 	rand.Seed(time.Now().UnixNano())
-	num := 1 + rand.Intn(4-1)
+	num := 1 + rand.Intn(int(rowCount+1)-1)
 	return num
 }

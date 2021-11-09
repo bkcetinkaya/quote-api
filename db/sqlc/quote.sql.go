@@ -18,3 +18,15 @@ func (q *Queries) GetQuote(ctx context.Context, id int64) (Quote, error) {
 	err := row.Scan(&i.ID, &i.Author, &i.Quote)
 	return i, err
 }
+
+const getQuoteRows = `-- name: GetQuoteRows :one
+SELECT COUNT(*)
+FROM quotes
+`
+
+func (q *Queries) GetQuoteRows(ctx context.Context) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getQuoteRows)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
