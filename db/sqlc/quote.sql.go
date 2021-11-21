@@ -7,6 +7,27 @@ import (
 	"context"
 )
 
+const createQuote = `-- name: CreateQuote :one
+INSERT INTO quotes (
+  quote, author
+) VALUES (
+  $1, $2
+)
+RETURNING id, author, quote
+`
+
+type CreateQuoteParams struct {
+	Quote  string
+	Author string
+}
+
+func (q *Queries) CreateQuote(ctx context.Context, arg CreateQuoteParams) (Quote, error) {
+	row := q.db.QueryRowContext(ctx, createQuote, arg.Quote, arg.Author)
+	var i Quote
+	err := row.Scan(&i.ID, &i.Author, &i.Quote)
+	return i, err
+}
+
 const getQuote = `-- name: GetQuote :one
 SELECT id, author, quote FROM quotes
 WHERE id = $1 LIMIT 1

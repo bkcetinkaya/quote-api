@@ -1,14 +1,5 @@
 package main
 
-/* -
-
-- Random int dönderen fonksiyonun max değeri databasedeki toplam quote sayısından almalı. (query.sql dosyasına getQuotes ekle)
-- db source gizli olmalı (probably env var kullanılacak)
-
-
-
-*/
-
 import (
 	"context"
 	db "daily-quote/db/sqlc"
@@ -45,8 +36,9 @@ func GetQuote() db.Quote {
 
 	conn, err2 := sql.Open(config.DBDriver, config.DBSource)
 	if err2 != nil {
-		panic(err2)
+		log.Fatal(err2)
 	}
+	defer conn.Close()
 
 	testQueries = db.New(conn)
 
