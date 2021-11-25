@@ -7,9 +7,11 @@ import (
 	"database/sql"
 	"log"
 	"math/rand"
+	"net/http"
 	"time"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 	_ "github.com/lib/pq"
 )
 
@@ -17,13 +19,16 @@ var testQueries *db.Queries
 
 func main() {
 
-	app := fiber.New()
+	e := echo.New()
 
-	app.Get("/", func(c *fiber.Ctx) error {
+	e.Use(middleware.Logger())
 
-		return c.JSON(GetQuote())
+	e.GET("/", func(c echo.Context) error {
+		return c.JSON(http.StatusOK, GetQuote())
 	})
-	app.Listen(":8080")
+
+	e.Logger.Fatal(e.Start(":8080"))
+
 }
 
 func GetQuote() db.Quote {
