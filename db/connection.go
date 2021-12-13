@@ -13,7 +13,7 @@ import (
 )
 
 // Connects to the MongoDB atlas cluster and returns the total amount of documents in collection
-func ConnectToDatabase() int64 {
+func ConnectToDatabase() []bson.D {
 
 	config, err := util.LoadConfig(".")
 	if err != nil {
@@ -37,19 +37,21 @@ func ConnectToDatabase() int64 {
 	quotesDatabase := client.Database("test")
 	quotesCollection := quotesDatabase.Collection("quotes")
 
-	DocumentCount, err := quotesCollection.CountDocuments(ctx, bson.M{})
+	var quote []bson.D
+
+	aggr := bson.D{{"$sample", bson.D{{"size", 1}}}}
+
+	cursor, err := quotesCollection.Aggregate(ctx, mongo.Pipeline{aggr})
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	return DocumentCount
+	err = cursor.All(ctx, &quote)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	// var restaurants bson.M
-	// err = quotesCollection.FindOne(ctx, bson.M{}).Decode(&restaurants)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+	fmt.Println(quote)
 
-	//fmt.Println(restaurants)
-
+	return quote
 }
