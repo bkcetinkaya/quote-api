@@ -2,7 +2,6 @@ package main
 
 import (
 	"daily-quote/db"
-	util "daily-quote/utils"
 	"net/http"
 
 	"github.com/labstack/echo"
@@ -11,14 +10,13 @@ import (
 
 func main() {
 
-	documentAmount := db.ConnectToDatabase()
-	util.GetRandomInt(documentAmount)
+	quote := db.ConnectToDatabase()
 
 	e := echo.New()
 	e.Use(middleware.Logger())
 
 	e.GET("/", func(c echo.Context) error {
-		return c.JSON(http.StatusOK, "blabla")
+		return c.JSON(http.StatusOK)
 	})
 
 	e.Logger.Fatal(e.Start(":8080"))
