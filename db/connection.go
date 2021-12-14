@@ -13,16 +13,15 @@ import (
 )
 
 // Connects to the MongoDB atlas cluster and returns the total amount of documents in collection
-func ConnectToDatabase() []bson.D {
+func ConnectToDatabase() []Quote {
 
 	config, err := util.LoadConfig(".")
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	// #region Connection To Database
 	uriString := fmt.Sprintf("mongodb+srv://kaancetinkayasf:%s@cluster0.tiask.mongodb.net/myFirstDatabase?retryWrites=true&w=majority", config.Password)
-
-	// Connection to MongoDB Atlas
 	clientOptions := options.Client().
 		ApplyURI(uriString)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -32,26 +31,22 @@ func ConnectToDatabase() []bson.D {
 		log.Fatal(err)
 	}
 	defer client.Disconnect(ctx)
+	// #endregion
 
-	// Db and collection declerations
+	// #region Db and collection declerations
 	quotesDatabase := client.Database("test")
 	quotesCollection := quotesDatabase.Collection("quotes")
+	// #endregion
 
-	var quote []bson.D
+	var quote []Quote
 
 	aggr := bson.D{{"$sample", bson.D{{"size", 1}}}}
 
 	cursor, err := quotesCollection.Aggregate(ctx, mongo.Pipeline{aggr})
+
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 	}
-
-	err = cursor.All(ctx, &quote)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println(quote)
-
+	cursor.All(ctx, &quote)
 	return quote
 }
