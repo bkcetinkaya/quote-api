@@ -10,13 +10,12 @@ import (
 
 func main() {
 
-	quote := db.ConnectToDatabase()
-
 	e := echo.New()
 	e.Use(middleware.Logger())
 
 	e.GET("/", func(c echo.Context) error {
-		return c.JSON(http.StatusOK)
+		quote := db.ConnectToDatabase()
+		return c.JSON(http.StatusOK, quote)
 	})
 
 	e.Logger.Fatal(e.Start(":8080"))
