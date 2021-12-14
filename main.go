@@ -14,6 +14,7 @@ func main() {
 	e.Use(middleware.Logger())
 
 	e.GET("/", func(c echo.Context) error {
+
 		quote := db.ConnectToDatabase()
 		return c.JSON(http.StatusOK, quote)
 	})

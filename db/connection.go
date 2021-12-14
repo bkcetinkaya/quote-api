@@ -30,7 +30,7 @@ func ConnectToDatabase() []Quote {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer client.Disconnect(ctx)
+
 	// #endregion
 
 	// #region Db and collection declerations
