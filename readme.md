@@ -1,4 +1,4 @@
-Quote Api
+*Quote Api
 
 - Tech stack: GO + MongoDB
 
