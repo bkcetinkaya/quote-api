@@ -12,7 +12,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// Connects to the MongoDB atlas cluster and returns the total amount of documents in collection
+// Connects to the MongoDB atlas cluster and returns one random document from the collection
 func ConnectToDatabase() []Quote {
 
 	config, err := util.LoadConfig(".")
