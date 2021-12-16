@@ -20,7 +20,6 @@ func ConnectToDatabase() []Quote {
 		log.Fatal(err)
 	}
 
-	// #region Connection To Database
 	uriString := fmt.Sprintf("mongodb+srv://kaancetinkayasf:%s@cluster0.tiask.mongodb.net/myFirstDatabase?retryWrites=true&w=majority", config.Password)
 	clientOptions := options.Client().
 		ApplyURI(uriString)
@@ -31,12 +30,8 @@ func ConnectToDatabase() []Quote {
 		log.Fatal(err)
 	}
 
-	// #endregion
-
-	// #region Db and collection declerations
 	quotesDatabase := client.Database("test")
 	quotesCollection := quotesDatabase.Collection("quotes")
-	// #endregion
 
 	var quote []Quote
 
